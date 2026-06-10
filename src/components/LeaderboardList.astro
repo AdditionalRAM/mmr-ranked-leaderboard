@@ -2,42 +2,82 @@
 import LeaderboardElement from "./LeaderboardElement.astro";
 import { getLeaderboardData } from "../utils/leaderboard";
 
-
-// const leaderboard: PlayerData[] = [
-//   { discordUsername: "voidwalker_99", minecraftUsername: "VoidRunner", country: "de", elo: 2150, pb: 852000 },
-//   { discordUsername: "speedy_sam", minecraftUsername: "SammyCraft", country: "us", elo: 1840, pb: 1008000 },
-//   { discordUsername: "emerald_kidd", minecraftUsername: "EmeraldKnight", country: "ca", elo: 1450, pb: 1170000 },
-//   { discordUsername: "golden_boy", minecraftUsername: "GoldStandard", country: "jp", elo: 1050, pb: 1326000 },
-//   { discordUsername: "iron_will", minecraftUsername: "WillMine", country: "gb", elo: 720, pb: 1704000 },
-//   { discordUsername: "coal_miner_8", minecraftUsername: "DiggerSteve", country: "br", elo: 350, pb: 2754000 },
-//   { discordUsername: "nether_king", minecraftUsername: "KingNether", country: "fr", elo: 2400, pb: 726000 },
-//   { discordUsername: "diamond_pro", minecraftUsername: "ShinyPickaxe", country: "au", elo: 1620, pb: 1092000 },
-//   { discordUsername: "emerald_vibe", minecraftUsername: "GreenGem", country: "no", elo: 1250, pb: 1218000 },
-//   { discordUsername: "iron_rookie", minecraftUsername: "RustySword", country: "de", elo: 650, pb: 1902000 },
-// ];
-
 const leaderboard = await getLeaderboardData();
+
+const currentSort = Astro.url.searchParams.get("sort") || "elo";
+
+if (currentSort === "elo") {
+  leaderboard.sort((a, b) => b.elo - a.elo);
+} else {
+  leaderboard.sort((a, b) => a.pb - b.pb);
+}
 ---
 
 <div class="leaderboard-container">
-  {leaderboard.length === 0 ? (
-    <p class="error">Failed to load leaderboard data</p>
-  ) : (
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Player</th>
-          <th>ELO</th>
-          <th>Rank</th>
-          <th>PB</th>
-        </tr>
-      </thead>
-      <tbody>
-        {leaderboard.map((player, index) => (
-          <LeaderboardElement player={player} position={index + 1} />
-        ))}
-      </tbody>
-    </table>
-  )}
+  <div class="sort-controls">
+    <a href="?sort=elo" class={currentSort === "elo" ? "active" : ""}
+      >Sorting by PB</a
+    >
+    <a href="?sort=pb" class={currentSort === "pb" ? "active" : ""}
+      >Sorting by ELO</a
+    >
+  </div>
+  {
+    leaderboard.length === 0 ? (
+      <p class="error">Failed to load leaderboard data</p>
+    ) : (
+      <table class="liquid-glass">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>ELO</th>
+            <th>Rank</th>
+            <th>PB</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leaderboard.map((player, index) => (
+            <LeaderboardElement player={player} position={index + 1} />
+          ))}
+        </tbody>
+      </table>
+    )
+  }
 </div>
+
+<style lang="scss">
+  .active {
+    display: none;
+  }
+
+  .leaderboard-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    margin-top: 3em;
+  }
+
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.05);
+
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%); /* Required for Safari */
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  table {
+    width: 100%;
+    // border-collapse: collapse;
+    text-align: left;
+  }
+  th {
+    padding: 1rem;
+    color: #aaa;
+  }
+</style>

@@ -32,12 +32,13 @@ const RANK_BRACKETS: RankBracket[] = [
   { minElo: 500,  tier: 'Coal',      division: 'III', className: 'rank-coal',      hexColor: '#a8a8a8' },
   { minElo: 400,  tier: 'Coal',      division: 'II',  className: 'rank-coal',      hexColor: '#a8a8a8' },
   { minElo: 0,    tier: 'Coal',      division: 'I',   className: 'rank-coal',      hexColor: '#a8a8a8' },
+  { minElo: -1,   tier: 'Unranked',  division: '',    className: 'rank-coal',      hexColor: '#a8a8a8' }
 ];
 
 function getRankFromElo(elo: number){
-    if(elo < 0 || isNaN(elo)) return RANK_BRACKETS[15];
+    if(elo <= 0 || isNaN(elo)) return RANK_BRACKETS[16];
     const rank = RANK_BRACKETS.find((bracket) => elo >= bracket.minElo);
-    if(!rank) return RANK_BRACKETS[15];
+    if(!rank) return RANK_BRACKETS[16];
     return rank;
 }
 
@@ -65,8 +66,35 @@ const {player, position} = Astro.props;
 
 <tr class="leaderboard-row">
     <td class="position">{position}</td>
-    <td class="mc-username">{`${getFlagEmoji(player.country)}${player.minecraftUsername}`}</td>
+    <td class="mc-username">{`${player.minecraftUsername}${getFlagEmoji(player.country)}`}</td>
     <td class="elo">{player.elo}</td>
     <td class={`rank ${getRankFromElo(player.elo).className}`}>{`${getRankFromElo(player.elo).tier} ${getRankFromElo(player.elo).division}`}</td>
     <td class="pb">{getDetailedTime(player.pb)}</td>
 </tr>
+
+<style lang="scss">
+    .leaderboard-row{
+        td{
+            padding: 1rem;
+        }
+    }
+
+    .rank-netherite{
+        color: #d455ff
+    }
+    .rank-diamond{
+        color: #55ffff;
+    }
+    .rank-emerald{
+        color: #55ff55;
+    }
+    .rank-gold{
+        color: #ffaa00;
+    }
+    .rank-iron{
+        color: #dddddd;
+    }
+    .rank-coal{
+        color: #a8a8a8;
+    }
+</style>
