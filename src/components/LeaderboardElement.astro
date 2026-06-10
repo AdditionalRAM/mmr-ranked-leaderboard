@@ -1,0 +1,72 @@
+---
+/* @jsxImportSource astro */
+import type { PlayerData } from "../utils/leaderboard";
+
+interface Props{
+    player: PlayerData;
+    position: number;
+}
+
+interface RankBracket {
+  minElo: number;
+  tier: string;
+  division: string;
+  className: string;
+  hexColor: string;
+}
+
+const RANK_BRACKETS: RankBracket[] = [
+  { minElo: 2000, tier: 'Netherite', division: '',    className: 'rank-netherite', hexColor: '#d455ff' },
+  { minElo: 1800, tier: 'Diamond',   division: 'III', className: 'rank-diamond',   hexColor: '#55ffff' },
+  { minElo: 1650, tier: 'Diamond',   division: 'II',  className: 'rank-diamond',   hexColor: '#55ffff' },
+  { minElo: 1500, tier: 'Diamond',   division: 'I',   className: 'rank-diamond',   hexColor: '#55ffff' },
+  { minElo: 1400, tier: 'Emerald',   division: 'III', className: 'rank-emerald',   hexColor: '#55ff55' },
+  { minElo: 1300, tier: 'Emerald',   division: 'II',  className: 'rank-emerald',   hexColor: '#55ff55' },
+  { minElo: 1200, tier: 'Emerald',   division: 'I',   className: 'rank-emerald',   hexColor: '#55ff55' },
+  { minElo: 1100, tier: 'Gold',      division: 'III', className: 'rank-gold',      hexColor: '#ffaa00' },
+  { minElo: 1000, tier: 'Gold',      division: 'II',  className: 'rank-gold',      hexColor: '#ffaa00' },
+  { minElo: 900,  tier: 'Gold',      division: 'I',   className: 'rank-gold',      hexColor: '#ffaa00' },
+  { minElo: 800,  tier: 'Iron',      division: 'III', className: 'rank-iron',      hexColor: '#dddddd' },
+  { minElo: 700,  tier: 'Iron',      division: 'II',  className: 'rank-iron',      hexColor: '#dddddd' },
+  { minElo: 600,  tier: 'Iron',      division: 'I',   className: 'rank-iron',      hexColor: '#dddddd' },
+  { minElo: 500,  tier: 'Coal',      division: 'III', className: 'rank-coal',      hexColor: '#a8a8a8' },
+  { minElo: 400,  tier: 'Coal',      division: 'II',  className: 'rank-coal',      hexColor: '#a8a8a8' },
+  { minElo: 0,    tier: 'Coal',      division: 'I',   className: 'rank-coal',      hexColor: '#a8a8a8' },
+];
+
+function getRankFromElo(elo: number){
+    if(elo < 0 || isNaN(elo)) return RANK_BRACKETS[15];
+    const rank = RANK_BRACKETS.find((bracket) => elo >= bracket.minElo);
+    if(!rank) return RANK_BRACKETS[15];
+    return rank;
+}
+
+function getDetailedTime(timeMiliseconds: number) {
+  const timeSeconds = Math.floor(timeMiliseconds / 1000);
+  const timeMinutes = Math.floor(timeSeconds / 60);
+
+  return `${timeMinutes}:${timeSeconds % 60}.${timeMiliseconds % 1000}`;
+}
+
+function getFlagEmoji(countryCode: string) {
+  if(countryCode == "" || countryCode == null) return "";
+  const codePoints = countryCode
+    .toUpperCase()
+    .split("")
+    .map((char) => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+
+const {player, position} = Astro.props;
+
+---
+<!-- TABLE STRUCTURE:
+ # | MCUSERNAME | ELO | RANK | PB -->
+
+<tr class="leaderboard-row">
+    <td class="position">{position}</td>
+    <td class="mc-username">{`${getFlagEmoji(player.country)}${player.minecraftUsername}`}</td>
+    <td class="elo">{player.elo}</td>
+    <td class={`rank ${getRankFromElo(player.elo).className}`}>{`${getRankFromElo(player.elo).tier} ${getRankFromElo(player.elo).division}`}</td>
+    <td class="pb">{getDetailedTime(player.pb)}</td>
+</tr>
