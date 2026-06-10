@@ -6,55 +6,118 @@ const leaderboard = await getLeaderboardData();
 
 const currentSort = Astro.url.searchParams.get("sort") || "elo";
 
-if (currentSort === "elo") {
-  leaderboard.sort((a, b) => b.elo - a.elo);
+if (currentSort === "pb") {
+  leaderboard.sort((a, b) => {
+    // treating 0 as infinity so it doesnt appear at the very top
+    const pbA = a.pb <= 0 ? Infinity : a.pb;
+    const pbB = b.pb <= 0 ? Infinity : b.pb;
+    
+    return pbA - pbB;
+  });
 } else {
-  leaderboard.sort((a, b) => a.pb - b.pb);
+  leaderboard.sort((a, b) => b.elo - a.elo);
 }
 ---
 
 <div class="leaderboard-container">
   <div class="sort-controls">
-    <a href="?sort=elo" class={currentSort === "elo" ? "active" : ""}
-      >Sorting by PB</a
+    <a
+      href="?sort=elo"
+      class={currentSort === "elo"
+        ? "active sort-button liquid-glass"
+        : "sort-button liquid-glass"}>Sorting by PB</a
     >
-    <a href="?sort=pb" class={currentSort === "pb" ? "active" : ""}
-      >Sorting by ELO</a
+    <a
+      href="?sort=pb"
+      class={currentSort === "pb"
+        ? "active sort-button liquid-glass"
+        : "sort-button liquid-glass"}>Sorting by ELO</a
     >
   </div>
   {
     leaderboard.length === 0 ? (
       <p class="error">Failed to load leaderboard data</p>
     ) : (
-      <table class="liquid-glass">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Player</th>
-            <th>ELO</th>
-            <th>Rank</th>
-            <th>PB</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leaderboard.map((player, index) => (
-            <LeaderboardElement player={player} position={index + 1} />
-          ))}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="liquid-glass">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>ELO</th>
+              <th>Rank</th>
+              <th>PB</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leaderboard.map((player, index) => (
+              <LeaderboardElement player={player} position={index + 1} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     )
   }
 </div>
 
 <style lang="scss">
+  .sort-controls {
+    height: 2em;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1em;
+
+    color: rgba(255, 255, 255, 0.95);
+
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .sort-button {
+      display: inline-block;
+      font-size: 1em;
+      border-radius: 9999px;
+      box-sizing: border-box;
+      padding: 0.5em 1em;
+      color: rgba(255, 255, 255, 0.95);
+      font-family: "Nunito", sans-serif;
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.1);
+
+      transition: 0.2s transform cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+      &:focus-visible {
+        outline: none;
+      }
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+      text-decoration: none !important;
+    }
+  }
   .active {
-    display: none;
+    display: none !important;
   }
 
   .leaderboard-container {
     max-width: 1000px;
     margin: 0 auto;
     margin-top: 3em;
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .liquid-glass {
@@ -73,8 +136,9 @@ if (currentSort === "elo") {
 
   table {
     width: 100%;
-    // border-collapse: collapse;
     text-align: left;
+    margin-bottom: 10vh;
+    min-width: 600px;
   }
   th {
     padding: 1rem;

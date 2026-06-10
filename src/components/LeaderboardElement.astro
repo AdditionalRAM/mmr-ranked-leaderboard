@@ -23,9 +23,9 @@ const RANK_BRACKETS: RankBracket[] = [
   { minElo: 1400, tier: 'Emerald',   division: 'III', className: 'rank-emerald',   hexColor: '#55ff55' },
   { minElo: 1300, tier: 'Emerald',   division: 'II',  className: 'rank-emerald',   hexColor: '#55ff55' },
   { minElo: 1200, tier: 'Emerald',   division: 'I',   className: 'rank-emerald',   hexColor: '#55ff55' },
-  { minElo: 1100, tier: 'Gold',      division: 'III', className: 'rank-gold',      hexColor: '#ffaa00' },
-  { minElo: 1000, tier: 'Gold',      division: 'II',  className: 'rank-gold',      hexColor: '#ffaa00' },
-  { minElo: 900,  tier: 'Gold',      division: 'I',   className: 'rank-gold',      hexColor: '#ffaa00' },
+  { minElo: 1100, tier: 'Gold',      division: 'III', className: 'rank-gold',      hexColor: '#dba213' },
+  { minElo: 1000, tier: 'Gold',      division: 'II',  className: 'rank-gold',      hexColor: '#dba213' },
+  { minElo: 900,  tier: 'Gold',      division: 'I',   className: 'rank-gold',      hexColor: '#dba213' },
   { minElo: 800,  tier: 'Iron',      division: 'III', className: 'rank-iron',      hexColor: '#dddddd' },
   { minElo: 700,  tier: 'Iron',      division: 'II',  className: 'rank-iron',      hexColor: '#dddddd' },
   { minElo: 600,  tier: 'Iron',      division: 'I',   className: 'rank-iron',      hexColor: '#dddddd' },
@@ -42,22 +42,21 @@ function getRankFromElo(elo: number){
     return rank;
 }
 
-function getDetailedTime(timeMiliseconds: number) {
-  const timeSeconds = Math.floor(timeMiliseconds / 1000);
-  const timeMinutes = Math.floor(timeSeconds / 60);
+function getDetailedTime(timeMilliseconds: number): string {
+  if (timeMilliseconds <= 0 || isNaN(timeMilliseconds)) {
+    return "--:--.---";
+  }
 
-  return `${timeMinutes}:${timeSeconds % 60}.${timeMiliseconds % 1000}`;
+  const minutes = Math.floor(timeMilliseconds / 60000);
+  const seconds = Math.floor((timeMilliseconds % 60000) / 1000);
+  const ms = timeMilliseconds % 1000;
+
+  const mm = minutes.toString().padStart(2, "0");
+  const ss = seconds.toString().padStart(2, "0");
+  const fff = ms.toString().padStart(3, "0");
+
+  return `${mm}:${ss}.${fff}`;
 }
-
-function getFlagEmoji(countryCode: string) {
-  if(countryCode == "" || countryCode == null) return "";
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
-
 const {player, position} = Astro.props;
 
 ---
@@ -66,13 +65,43 @@ const {player, position} = Astro.props;
 
 <tr class="leaderboard-row">
     <td class="position">{position}</td>
-    <td class="mc-username">{`${player.minecraftUsername}${getFlagEmoji(player.country)}`}</td>
+    <td class="mc-username"><a class="player-link" href={`https://mcsrranked.com/stats/${player.minecraftUsername}`} target="_blank">{player.minecraftUsername}</a>{player.country && (
+            <img 
+                src={`https://flagcdn.com/h20/${player.country}.png`} 
+                alt={player.country}
+                class="country-flag"
+                height="20"
+            />
+        )}</td>
     <td class="elo">{player.elo}</td>
     <td class={`rank ${getRankFromElo(player.elo).className}`}>{`${getRankFromElo(player.elo).tier} ${getRankFromElo(player.elo).division}`}</td>
     <td class="pb">{getDetailedTime(player.pb)}</td>
 </tr>
 
 <style lang="scss">
+
+    .mc-username {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .country-flag {
+        display: inline-block;
+        border-radius: 2px;
+        opacity: 0.85;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .player-link{
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.95);
+        transition: 0.2s color cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        &:hover{
+            color: #dba213;
+        }
+    }
+
     .leaderboard-row{
         td{
             padding: 1rem;
@@ -89,7 +118,7 @@ const {player, position} = Astro.props;
         color: #55ff55;
     }
     .rank-gold{
-        color: #ffaa00;
+        color: #dba213;
     }
     .rank-iron{
         color: #dddddd;
