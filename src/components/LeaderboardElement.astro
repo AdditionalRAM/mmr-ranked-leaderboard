@@ -32,7 +32,8 @@ const RANK_BRACKETS: RankBracket[] = [
   { minElo: 500,  tier: 'Coal',      division: 'III', className: 'rank-coal',      hexColor: '#a8a8a8' },
   { minElo: 400,  tier: 'Coal',      division: 'II',  className: 'rank-coal',      hexColor: '#a8a8a8' },
   { minElo: 0,    tier: 'Coal',      division: 'I',   className: 'rank-coal',      hexColor: '#a8a8a8' },
-  { minElo: -1,   tier: 'Unranked',  division: '',    className: 'rank-coal',      hexColor: '#a8a8a8' }
+  { minElo: -1,   tier: 'Unranked',  division: '',    className: 'rank-coal',      hexColor: '#a8a8a8' },
+  { minElo: -2,   tier: 'GOAT',      division: '',    className: 'rank-netherite', hexColor: '#d455ff' }
 ];
 
 function getRankFromElo(elo: number){
@@ -40,6 +41,11 @@ function getRankFromElo(elo: number){
     const rank = RANK_BRACKETS.find((bracket) => elo >= bracket.minElo);
     if(!rank) return RANK_BRACKETS[16];
     return rank;
+}
+
+function getPlayerRank(player: PlayerData){
+    if(player.minecraftUsername.toLowerCase() == "slackow") return RANK_BRACKETS[17];
+    return getRankFromElo(player.elo);
 }
 
 function getDetailedTime(timeMilliseconds: number): string {
@@ -74,7 +80,7 @@ const {player, position} = Astro.props;
             />
         )}</td>
     <td class="elo">{player.elo}</td>
-    <td class={`rank ${getRankFromElo(player.elo).className}`}>{`${getRankFromElo(player.elo).tier} ${getRankFromElo(player.elo).division}`}</td>
+    <td class={`rank ${getPlayerRank(player).className}`}>{`${getPlayerRank(player).tier} ${getPlayerRank(player).division}`}</td>
     <td class="pb">{getDetailedTime(player.pb)}</td>
 </tr>
 
