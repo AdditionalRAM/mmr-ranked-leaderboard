@@ -67,7 +67,7 @@ const {player, position} = Astro.props;
 
 ---
 <!-- TABLE STRUCTURE:
- # | MCUSERNAME | ELO | RANK | PB -->
+ # | MCUSERNAME | ELO | RANK | PB | AVG -->
 
 <tr class="leaderboard-row">
     <td class="position">{position}</td>
@@ -82,6 +82,7 @@ const {player, position} = Astro.props;
     <td class="elo">{player.elo}</td>
     <td class={`rank ${getPlayerRank(player).className}`}>{`${getPlayerRank(player).tier} ${getPlayerRank(player).division}`}</td>
     <td class="pb">{getDetailedTime(player.pb)}</td>
+    <td class="avg">{getDetailedTime(Math.floor(player.average))}</td>
 </tr>
 
 <style lang="scss">

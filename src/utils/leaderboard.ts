@@ -4,6 +4,7 @@ export interface PlayerData {
     country: string;
     elo: number;
     pb: number;
+    average: number;
 }
 
 interface CacheEntry {
@@ -64,13 +65,15 @@ export async function getLeaderboardData(): Promise<PlayerData[]> {
                         minecraftUsername: mcsrJson.data.nickname,
                         elo: mcsrJson.data.eloRate,
                         pb: mcsrJson.data.statistics.total.bestTime.ranked,
-                        country: mcsrJson.data.country,
+                        average: mcsrJson.data.statistics.season.completionTime.ranked / mcsrJson.data.statistics.season.completions.ranked,
+                        country: mcsrJson.data.country
                     };
                 } catch {
                     // fallback data
                     return {
                         discordUsername: player.discordName,
                         minecraftUsername: "Unknown",
+                        average: 0,
                         elo: 0,
                         pb: 0,
                         country: "",
@@ -93,6 +96,7 @@ export async function getLeaderboardData(): Promise<PlayerData[]> {
         return [{
             discordUsername: "unknown",
             minecraftUsername: "Unknown",
+            average: 0,
             elo: 0,
             pb: 0,
             country: "",
