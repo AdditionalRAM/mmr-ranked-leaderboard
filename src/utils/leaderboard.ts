@@ -19,7 +19,7 @@ declare global {
 globalThis.__leaderboardCache = globalThis.__leaderboardCache || null;
 
 const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfGTeU4wvsxSS-TRNMRoIDrRMTTA09MJX8DakMkoe0iPAAxa5CjsPtRabFftTgewd5xjLiKqjd6ECC/pub?output=csv"
-const CACHE_TTL = 60 * 1000; // 60 seconds in ms
+const CACHE_TTL = 120 * 1000; // 120 seconds in ms
 
 
 async function getPlayersFromSheets(): Promise<{ discordName: string; uuid: string }[]> {
@@ -102,6 +102,17 @@ export async function getLeaderboardData(): Promise<PlayerData[]> {
             country: "",
         }];
     }
+}
+
+export function getLastUpdated() : number{
+    const now = Date.now();
+    const cache = globalThis.__leaderboardCache;
+    if(cache) return cache.timestamp;
+    else return now;
+}
+
+export function getCacheTTL() : number{
+    return CACHE_TTL;
 }
 
 export { };
