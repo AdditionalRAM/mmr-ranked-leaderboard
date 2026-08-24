@@ -14,6 +14,15 @@ if (currentSort === "pb") {
     
     return pbA - pbB;
   });
+}
+else if(currentSort === "avg"){
+  leaderboard.sort((a, b) => {
+    // treating 0 as infinity so it doesnt appear at the very top
+    const avgA = a.average <= 0 ? Infinity : a.average;
+    const avgB = b.average <= 0 ? Infinity : b.average;
+    
+    return avgA - avgB;
+  });
 } else {
   leaderboard.sort((a, b) => b.elo - a.elo);
 }
@@ -23,15 +32,21 @@ if (currentSort === "pb") {
   <div class="sort-controls">
     <a
       href="?sort=elo"
-      class={currentSort === "elo"
+      class={currentSort != "pb"
         ? "active sort-button liquid-glass"
         : "sort-button liquid-glass"}>Sorting by PB</a
     >
     <a
-      href="?sort=pb"
-      class={currentSort === "pb"
+      href="?sort=avg"
+      class={currentSort != "elo"
         ? "active sort-button liquid-glass"
         : "sort-button liquid-glass"}>Sorting by ELO</a
+    >
+    <a
+      href="?sort=pb"
+      class={currentSort != "avg"
+        ? "active sort-button liquid-glass"
+        : "sort-button liquid-glass"}>Sorting by AVG</a
     >
   </div>
   {
