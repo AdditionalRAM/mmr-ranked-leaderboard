@@ -82,6 +82,12 @@ export async function getLeaderboardData(): Promise<PlayerData[]> {
             })
         );
 
+        // we will invalidate result if more than 20% of players are "Unknown"
+        // which probably means the ranked API is currently down
+        const maxUnknownCount = Math.floor(players.length * 0.20); 
+        const currentUnknownCount = fullLeaderboard.filter((p) => p.minecraftUsername == "Unknown").length;
+        if(currentUnknownCount > maxUnknownCount) throw new Error("Over 20% of the players are unknown!");
+
         // save to cache after fetching
         globalThis.__leaderboardCache = {
             data: fullLeaderboard,

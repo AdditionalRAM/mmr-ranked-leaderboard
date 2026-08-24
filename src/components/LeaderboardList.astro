@@ -100,7 +100,7 @@ else if(currentSort === "avg"){
     setInterval(() => {
       const currentSeconds = Math.floor((Date.now() - timestamp) / 1000);
       timeElement.textContent = currentSeconds.toString();
-      if(currentSeconds >= cacheTTL / 1000) window.location.reload();
+      // if(currentSeconds >= cacheTTL / 1000) window.location.reload();
     }, 1000)
   }
 </script>
